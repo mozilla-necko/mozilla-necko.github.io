@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Season's greetings"
+title:  "Necko News #2 - Season's greetings"
 date:   2021-12-23 18:00:00 +0200
 categories: newsletter
 author: Dragana Damjanovic

@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "First Necko Newsletter"
+title:  "Necko News #1 - First Necko Newsletter"
 date:   2021-09-27 14:45:00 +0200
 categories: newsletter
 author: Valentin Gosu
