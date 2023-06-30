@@ -33,4 +33,4 @@ Ping Chen (:rnons) fixed [Bug 1717185 - TCPSocket.send incorrectly returns true 
 
 Nihanth is making our TRR implementation (Trusted-Recursive-Resolver) [fall back to unencrypted DNS less often](https://bugzilla.mozilla.org/show_bug.cgi?id=1714182)
 
-Read this on [dev-platform](https://groups.google.com/a/mozilla.org/g/dev-platform/c/_hYnRM1DvRg/m/7kVA3a2gAgAJ)
+Read this newsletter on [dev-platform](https://groups.google.com/a/mozilla.org/g/dev-platform/c/_hYnRM1DvRg/m/7kVA3a2gAgAJ)

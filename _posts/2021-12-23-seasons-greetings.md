@@ -38,4 +38,4 @@ We would like to wish you all a happy and healthy holiday season!
 
 - Necko Team
 
-Read this on [dev-platform](https://groups.google.com/a/mozilla.org/g/dev-platform/c/QbIZTTUlrIQ/m/8L7YEu_kDQAJ)
+Read this newsletter on [dev-platform](https://groups.google.com/a/mozilla.org/g/dev-platform/c/QbIZTTUlrIQ/m/8L7YEu_kDQAJ)
