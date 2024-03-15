@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Necko News #5 - Strengthening Community Involvement"
-date: 2023-03-15 17:30:00 +0100
+date: 2024-03-15 17:30:00 +0100
 categories: newsletter
 author: Manuel Bucher
 ---
