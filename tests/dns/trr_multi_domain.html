@@ -57,14 +57,14 @@
 </head>
 <body>
     <h1>DNS Performance Test</h1>
-    <p>Loading 25 favicons from different domains to measure DNS lookup performance...</p>
+    <p>Loading 50 favicons from different domains to measure DNS lookup performance...</p>
 
     <div class="status" id="status">
         Initializing test...
     </div>
 
     <div class="results" id="results">
-        <div id="progress">Progress: 0/25</div>
+        <div id="progress">Progress: 0/50</div>
         <div id="timing"></div>
     </div>
 
@@ -96,7 +96,32 @@
             'twitch.tv',
             'cnn.com',
             'pinterest.com',
-            'cloudflare.com'
+            'cloudflare.com',
+            'dropbox.com',
+            'shopify.com',
+            'oracle.com',
+            'ibm.com',
+            'intel.com',
+            'nvidia.com',
+            'cisco.com',
+            'hp.com',
+            'dell.com',
+            'walmart.com',
+            'target.com',
+            'bestbuy.com',
+            'homedepot.com',
+            'costco.com',
+            'ikea.com',
+            'uber.com',
+            'lyft.com',
+            'booking.com',
+            'expedia.com',
+            'tripadvisor.com',
+            'yelp.com',
+            'imdb.com',
+            'espn.com',
+            'nytimes.com',
+            'bbc.com'
         ];
 
         const startTime = performance.now();
@@ -188,7 +213,7 @@
 
         function updateProgress() {
             document.getElementById('progress').textContent =
-                `Progress: ${completed}/25 | Success: ${successCount} | Failed: ${failCount}`;
+                `Progress: ${completed}/50 | Success: ${successCount} | Failed: ${failCount}`;
 
             if (completed === domains.length) {
                 const totalTime = (performance.now() - startTime).toFixed(2);
