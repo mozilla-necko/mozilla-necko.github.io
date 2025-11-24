@@ -282,6 +282,11 @@
             showStatus('Running benchmark...');
             document.getElementById('rawResults').style.display = 'none';
 
+            document.getElementById('faviconSeqMean').textContent = '--';
+            document.getElementById('faviconSeqMedian').textContent = '--';
+            document.getElementById('imageMean').textContent = '--';
+            document.getElementById('imageMedian').textContent = '--';
+
             const faviconSeqTableBody = document.getElementById('faviconSeqTableBody');
             const imageTableBody = document.getElementById('imageTableBody');
             faviconSeqTableBody.innerHTML = '';
