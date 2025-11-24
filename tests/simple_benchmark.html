@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Network Benchmark</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            max-width: 1000px;
+            margin: 20px auto;
+            padding: 20px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            margin: 20px 0;
+        }
+        .metric {
+            margin: 10px 0;
+            padding: 10px;
+            background: #f5f5f5;
+        }
+        .metric-label {
+            font-weight: bold;
+        }
+        .metric-value {
+            font-size: 24px;
+            color: #0066cc;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background: #f5f5f5;
+        }
+    </style>
+</head>
+<body>
+    <h1>Simple Network Benchmark</h1>
+
+    <button onclick="runBenchmark()">Run Benchmark</button>
+
+    <div id="status"></div>
+
+    <h2>Favicon Request Timings (Sequential)</h2>
+    <p>Making 50 favicon requests sequentially</p>
+    <div class="metric">
+        <div class="metric-label">Mean Request Time</div>
+        <div class="metric-value" id="faviconSeqMean">--</div>
+    </div>
+    <div class="metric">
+        <div class="metric-label">Median Request Time</div>
+        <div class="metric-value" id="faviconSeqMedian">--</div>
+    </div>
+
+    <h2>Favicon Request Timings (Parallel)</h2>
+    <p>Making 50 favicon requests in parallel</p>
+    <div class="metric">
+        <div class="metric-label">Mean Request Time</div>
+        <div class="metric-value" id="faviconMean">--</div>
+    </div>
+    <div class="metric">
+        <div class="metric-label">Median Request Time</div>
+        <div class="metric-value" id="faviconMedian">--</div>
+    </div>
+
+    <h2>File Download Timings</h2>
+    <p>Downloading 6 files sequentially</p>
+    <div class="metric">
+        <div class="metric-label">Mean Throughput</div>
+        <div class="metric-value" id="imageMean">--</div>
+    </div>
+    <div class="metric">
+        <div class="metric-label">Median Throughput</div>
+        <div class="metric-value" id="imageMedian">--</div>
+    </div>
+
+    <div id="rawResults" style="display: none;">
+        <h2>Raw Results</h2>
+
+        <h3>Favicon Requests Sequential (50 domains)</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Domain</th>
+                    <th>Fetch Time (ms)</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody id="faviconSeqTableBody">
+            </tbody>
+        </table>
+
+        <h3>Favicon Requests Parallel (50 domains)</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Domain</th>
+                    <th>Fetch Time (ms)</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody id="faviconTableBody">
+            </tbody>
+        </table>
+
+        <h3>File Downloads (6 files)</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>URL</th>
+                    <th>Size (MB)</th>
+                    <th>Time (s)</th>
+                    <th>Throughput (MB/s)</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody id="imageTableBody">
+            </tbody>
+        </table>
+
+        <h3>Downloaded Images</h3>
+        <div id="imagesDisplay"></div>
+    </div>
+
+    <script>
+        const TOP_DOMAINS_SEQ = [
+            'google.com', 'youtube.com', 'facebook.com', 'twitter.com', 'instagram.com',
+            'linkedin.com', 'reddit.com', 'amazon.com', 'wikipedia.org', 'netflix.com',
+            'apple.com', 'microsoft.com', 'github.com', 'stackoverflow.com', 'medium.com',
+            'twitch.tv', 'pinterest.com', 'tumblr.com', 'wordpress.com', 'blogger.com',
+            'nytimes.com', 'cnn.com', 'bbc.com', 'theguardian.com', 'wsj.com',
+            'ebay.com', 'walmart.com', 'target.com', 'bestbuy.com', 'yelp.com',
+            'imdb.com', 'espn.com', 'tripadvisor.com', 'airbnb.com', 'mozilla.org',
+            'adobe.com', 'paypal.com', 'spotify.com', 'zoom.us', 'steampowered.com',
+            'salesforce.com', 'oracle.com', 'ibm.com', 'intel.com', 'nvidia.com',
+            'coinbase.com', 'craigslist.org', 'etsy.com', 'shopify.com', 'slack.com'
+        ];
+
+        const TOP_DOMAINS_PARALLEL = [
+            'yahoo.com', 'bing.com', 'vimeo.com', 'dailymotion.com', 'flickr.com',
+            'deviantart.com', 'soundcloud.com', 'vk.com', 'telegram.org', 'skype.com',
+            'forbes.com', 'reuters.com', 'bloomberg.com', 'techcrunch.com', 'wired.com',
+            'arstechnica.com', 'theverge.com', 'engadget.com', 'gizmodo.com', 'mashable.com',
+            'huffpost.com', 'buzzfeed.com', 'npr.org', 'pbs.org', 'nationalgeographic.com',
+            'weather.com', 'accuweather.com', 'time.com', 'usatoday.com', 'washingtonpost.com',
+            'latimes.com', 'economist.com', 'arxiv.org', 'researchgate.net', 'academia.edu',
+            'coursera.org', 'khanacademy.org', 'edx.org', 'codecademy.com', 'quora.com',
+            'baidu.com', 'yandex.com', 'duckduckgo.com', 'ask.com', 'aol.com',
+            'live.com', 'msn.com', 'outlook.com', 'protonmail.com', 'mail.ru'
+        ];
+
+        const IMAGE_URLS = [
+            'https://upload.wikimedia.org/wikipedia/commons/7/7d/Woman_lighting_the_candles_for_the_Festival_of_Lights_in_India_%28cropped%29.jpg',
+            'https://upload.wikimedia.org/wikipedia/commons/7/7d/%22_The_Calutron_Girls%22_Y-12_Oak_Ridge_1944_Large_Format_%2832093954911%29_%282%29.jpg',
+            'https://upload.wikimedia.org/wikipedia/commons/6/65/%22Scenic_Inn%22_at_Dana_Cove_%2829366426673%29.jpg',
+            'https://upload.wikimedia.org/wikipedia/commons/8/85/%22_Shot_From_The_Sky%22_Army_Show_1945_Oak_Ridge_%2824971013612%29.jpg',
+            'https://images.pexels.com/photos/1054666/pexels-photo-1054666.jpeg',
+            'https://blog.aspinallfoundation.org/hs-fs/hubfs/2024%20Landing%20pages%20-%20Blogs/Damian%20Lions%20in%20Africa%20July%202024%20by%20Wiki%20West%20Large%20WM%20sRGB-4.jpg?width=6327&height=4220&name=Damian%20Lions%20in%20Africa%20July%202024%20by%20Wiki%20West%20Large%20WM%20sRGB-4.jpg'
+        ];
+
+        function showStatus(message) {
+            document.getElementById('status').textContent = message;
+        }
+
+        function calculateMedian(values) {
+            const sorted = values.slice().sort((a, b) => a - b);
+            const mid = Math.floor(sorted.length / 2);
+            return sorted.length % 2 === 0
+                ? (sorted[mid - 1] + sorted[mid]) / 2
+                : sorted[mid];
+        }
+
+        function calculateMean(values) {
+            return values.reduce((a, b) => a + b, 0) / values.length;
+        }
+
+        async function fetchFavicon(domain) {
+            const url = `https://${domain}/favicon.ico`;
+            try {
+                const startTime = performance.now();
+                const response = await fetch(url, {
+                    method: 'GET',
+                    cache: 'no-store',
+                    mode: 'no-cors'
+                });
+                const endTime = performance.now();
+
+                return {
+                    domain,
+                    time: endTime - startTime,
+                    status: 'OK'
+                };
+            } catch (error) {
+                return {
+                    domain,
+                    time: null,
+                    status: `Error: ${error.message}`
+                };
+            }
+        }
+
+        async function fetchImage(url) {
+            try {
+                const startTime = performance.now();
+                const response = await fetch(url, {
+                    cache: 'no-store'
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+
+                const reader = response.body.getReader();
+                let receivedLength = 0;
+
+                while (true) {
+                    const {done, value} = await reader.read();
+                    if (done) break;
+                    receivedLength += value.length;
+                }
+
+                const endTime = performance.now();
+                const duration = (endTime - startTime) / 1000;
+                const megabytes = receivedLength / (1024 * 1024);
+                const throughput = megabytes / duration;
+
+                return {
+                    url,
+                    size: megabytes,
+                    time: duration,
+                    throughput,
+                    status: 'OK'
+                };
+            } catch (error) {
+                return {
+                    url,
+                    size: null,
+                    time: null,
+                    throughput: null,
+                    status: `Error: ${error.message}`
+                };
+            }
+        }
+
+        async function runBenchmark() {
+            showStatus('Running benchmark...');
+            document.getElementById('rawResults').style.display = 'none';
+
+            const faviconSeqTableBody = document.getElementById('faviconSeqTableBody');
+            const faviconTableBody = document.getElementById('faviconTableBody');
+            const imageTableBody = document.getElementById('imageTableBody');
+            faviconSeqTableBody.innerHTML = '';
+            faviconTableBody.innerHTML = '';
+            imageTableBody.innerHTML = '';
+
+            showStatus(`Fetching favicons from ${TOP_DOMAINS_SEQ.length} domains sequentially...`);
+            const faviconSeqResults = [];
+            for (let i = 0; i < TOP_DOMAINS_SEQ.length; i++) {
+                showStatus(`Fetching favicon sequentially ${i + 1}/${TOP_DOMAINS_SEQ.length}...`);
+                const result = await fetchFavicon(TOP_DOMAINS_SEQ[i]);
+                faviconSeqResults.push(result);
+
+                const row = faviconSeqTableBody.insertRow();
+                row.insertCell(0).textContent = result.domain;
+                row.insertCell(1).textContent = result.time ? result.time.toFixed(2) : 'N/A';
+                row.insertCell(2).textContent = result.status;
+            }
+
+            const validFaviconSeqTimes = faviconSeqResults
+                .filter(r => r.time !== null)
+                .map(r => r.time);
+
+            if (validFaviconSeqTimes.length > 0) {
+                const faviconSeqMean = calculateMean(validFaviconSeqTimes);
+                const faviconSeqMedian = calculateMedian(validFaviconSeqTimes);
+                document.getElementById('faviconSeqMean').textContent = `${faviconSeqMean.toFixed(2)} ms`;
+                document.getElementById('faviconSeqMedian').textContent = `${faviconSeqMedian.toFixed(2)} ms`;
+            }
+
+            showStatus(`Fetching favicons from ${TOP_DOMAINS_PARALLEL.length} domains in parallel...`);
+            const faviconPromises = TOP_DOMAINS_PARALLEL.map(domain => fetchFavicon(domain));
+            const faviconResults = await Promise.all(faviconPromises);
+
+            faviconResults.forEach(result => {
+                const row = faviconTableBody.insertRow();
+                row.insertCell(0).textContent = result.domain;
+                row.insertCell(1).textContent = result.time ? result.time.toFixed(2) : 'N/A';
+                row.insertCell(2).textContent = result.status;
+            });
+
+            const validFaviconTimes = faviconResults
+                .filter(r => r.time !== null)
+                .map(r => r.time);
+
+            if (validFaviconTimes.length > 0) {
+                const faviconMean = calculateMean(validFaviconTimes);
+                const faviconMedian = calculateMedian(validFaviconTimes);
+                document.getElementById('faviconMean').textContent = `${faviconMean.toFixed(2)} ms`;
+                document.getElementById('faviconMedian').textContent = `${faviconMedian.toFixed(2)} ms`;
+            }
+
+            showStatus(`Downloading images from ${IMAGE_URLS.length} URLs...`);
+            const imageResults = [];
+            const imagesDisplay = document.getElementById('imagesDisplay');
+            imagesDisplay.innerHTML = '';
+
+            for (let i = 0; i < IMAGE_URLS.length; i++) {
+                showStatus(`Downloading image ${i + 1}/${IMAGE_URLS.length}...`);
+                const result = await fetchImage(IMAGE_URLS[i]);
+                imageResults.push(result);
+
+                const row = imageTableBody.insertRow();
+                const urlCell = row.insertCell(0);
+                const link = document.createElement('a');
+                link.href = result.url;
+                link.textContent = result.url;
+                link.target = '_blank';
+                urlCell.appendChild(link);
+                row.insertCell(1).textContent = result.size ? result.size.toFixed(2) : 'N/A';
+                row.insertCell(2).textContent = result.time ? result.time.toFixed(2) : 'N/A';
+                row.insertCell(3).textContent = result.throughput ? result.throughput.toFixed(2) : 'N/A';
+                row.insertCell(4).textContent = result.status;
+
+                if (result.status === 'OK') {
+                    const img = document.createElement('img');
+                    img.src = result.url;
+                    img.style.maxWidth = '400px';
+                    img.style.margin = '10px';
+                    imagesDisplay.appendChild(img);
+                }
+            }
+
+            const validImageThroughputs = imageResults
+                .filter(r => r.throughput !== null)
+                .map(r => r.throughput);
+
+            if (validImageThroughputs.length > 0) {
+                const imageMean = calculateMean(validImageThroughputs);
+                const imageMedian = calculateMedian(validImageThroughputs);
+                document.getElementById('imageMean').textContent = `${imageMean.toFixed(2)} MB/s`;
+                document.getElementById('imageMedian').textContent = `${imageMedian.toFixed(2)} MB/s`;
+            }
+
+            document.getElementById('rawResults').style.display = 'block';
+            showStatus('Benchmark complete!');
+        }
+    </script>
+</body>
+</html>
