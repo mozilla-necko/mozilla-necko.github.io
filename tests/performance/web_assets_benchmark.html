@@ -120,8 +120,6 @@
             { url: 'https://jsonplaceholder.typicode.com/comments', category: 'JSON API', name: 'JSONPlaceholder comments' },
             { url: 'https://jsonplaceholder.typicode.com/users', category: 'JSON API', name: 'JSONPlaceholder users' },
             { url: 'https://api.github.com/repos/mozilla/gecko-dev', category: 'JSON API', name: 'GitHub API gecko-dev' },
-            { url: 'https://httpbin.org/json', category: 'JSON API', name: 'httpbin JSON' },
-            { url: 'https://httpbin.org/headers', category: 'JSON API', name: 'httpbin headers' },
             { url: 'https://dummyjson.com/products', category: 'JSON API', name: 'DummyJSON products' },
             { url: 'https://fakestoreapi.com/products', category: 'JSON API', name: 'FakeStore products' },
 
@@ -256,12 +254,34 @@
             section.className = 'results-section';
 
             const successfulResults = results.filter(r => r.status === 'OK');
+            const failedResults = results.filter(r => r.status !== 'OK');
             const durations = successfulResults.map(r => r.duration);
             const throughputs = successfulResults.map(r => r.throughputMbps);
             const latencyStats = calculateStats(durations);
             const throughputStats = calculateStats(throughputs);
 
-            let html = '<h2>Overall Statistics</h2>';
+            const uniqueAssets = new Set(results.map(r => r.url)).size;
+
+            let html = `<h2>Summary</h2>
+                <div class="stats-row">
+                    <span class="metric">
+                        <div class="metric-label">Assets</div>
+                        <div class="metric-value">${uniqueAssets}</div>
+                    </span>
+                    <span class="metric">
+                        <div class="metric-label">Total Requests</div>
+                        <div class="metric-value">${results.length}</div>
+                    </span>
+                    <span class="metric">
+                        <div class="metric-label">Successful</div>
+                        <div class="metric-value">${successfulResults.length}</div>
+                    </span>
+                    <span class="metric">
+                        <div class="metric-label">Errors</div>
+                        <div class="metric-value">${failedResults.length}</div>
+                    </span>
+                </div>
+            <h2>Overall Statistics</h2>`;
 
             if (latencyStats) {
                 html += `
