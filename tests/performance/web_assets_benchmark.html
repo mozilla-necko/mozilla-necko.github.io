@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Assets Benchmark</title>
+    <style>
+        body { font-family: sans-serif; max-width: 1200px; margin: 20px auto; padding: 20px; font-size: 14px; }
+        h1 { font-size: 24px; }
+        button { padding: 8px 16px; font-size: 14px; margin: 15px 5px 15px 0; }
+        .config { margin: 15px 0; padding: 15px; background: #f0f0f0; border-radius: 4px; }
+        .config label { margin-right: 20px; }
+        .config input { width: 60px; margin-right: 5px; }
+        .metric { display: inline-block; margin: 8px 16px 8px 0; padding: 8px 12px; background: #f5f5f5; border-radius: 4px; }
+        .metric-label { font-weight: bold; font-size: 12px; color: #666; }
+        .metric-value { font-size: 18px; color: #0066cc; }
+        .stats-row { margin: 10px 0; }
+        table { width: 100%; border-collapse: collapse; margin: 15px 0; font-size: 12px; }
+        th, td { padding: 6px 8px; text-align: left; border-bottom: 1px solid #ddd; }
+        th { background: #f5f5f5; }
+        td.url { max-width: 400px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .status { padding: 10px; margin: 10px 0; background: #e8f4fd; border-radius: 4px; }
+        .results-section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <h1>Web Assets Benchmark</h1>
+    <p>Measures latency and throughput fetching real-world assets from popular CDNs and websites. Cache-busting query parameters are added to each request to bypass browser caching.</p>
+
+    <div class="config">
+        <label>Concurrent requests: <input type="number" id="concurrency" value="20" min="1" max="50"></label>
+        <label>Iterations: <input type="number" id="iterations" value="3" min="1" max="10"></label>
+    </div>
+
+    <button onclick="runBenchmark()">Run Benchmark</button>
+    <button onclick="clearResults()">Clear Results</button>
+
+    <div id="status" class="status" style="display: none;"></div>
+
+    <div id="results"></div>
+
+    <script>
+        const ASSETS = [
+            // JS Frameworks - cdnjs (Cloudflare)
+            { url: 'https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js', category: 'JS Framework', name: 'React' },
+            { url: 'https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js', category: 'JS Framework', name: 'React DOM' },
+            { url: 'https://cdnjs.cloudflare.com/ajax/libs/vue/3.4.21/vue.global.prod.min.js', category: 'JS Framework', name: 'Vue 3' },
+            { url: 'https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.8.3/angular.min.js', category: 'JS Framework', name: 'Angular 1.x' },
+            { url: 'https://cdnjs.cloudflare.com/ajax/libs/preact/10.19.6/preact.min.js', category: 'JS Framework', name: 'Preact' },
+            { url: 'https://cdnjs.cloudflare.com/ajax/libs/backbone.js/1.6.0/backbone-min.js', category: 'JS Framework', name: 'Backbone.js' },
+
+            // JS Libraries - cdnjs
+            { url: 'https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js', category: 'JS Library', name: 'jQuery' },
+            { url: 'https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.21/lodash.min.js', category: 'JS Library', name: 'Lodash' },
+            { url: 'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js', category: 'JS Library', name: 'Three.js' },
+            { url: 'https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js', category: 'JS Library', name: 'D3.js' },
+            { url: 'https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.30.1/moment.min.js', category: 'JS Library', name: 'Moment.js' },
+            { url: 'https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.8/axios.min.js', category: 'JS Library', name: 'Axios' },
+            { url: 'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js', category: 'JS Library', name: 'Chart.js' },
+            { url: 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js', category: 'JS Library', name: 'GSAP' },
+            { url: 'https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.2/anime.min.js', category: 'JS Library', name: 'Anime.js' },
+            { url: 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js', category: 'JS Library', name: 'Highlight.js' },
+            { url: 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.0.379/pdf.min.mjs', category: 'JS Library', name: 'PDF.js' },
+            { url: 'https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.4/socket.io.min.js', category: 'JS Library', name: 'Socket.io' },
+            { url: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js', category: 'JS Library', name: 'Leaflet' },
+            { url: 'https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.1/marked.min.js', category: 'JS Library', name: 'Marked' },
+            { url: 'https://cdnjs.cloudflare.com/ajax/libs/prism/9000.0.1/prism.min.js', category: 'JS Library', name: 'Prism.js' },
+            { url: 'https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.10/dayjs.min.js', category: 'JS Library', name: 'Day.js' },
+            { url: 'https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.13.6/underscore-min.js', category: 'JS Library', name: 'Underscore.js' },
+
+            // JS Libraries - jsDelivr CDN
+            { url: 'https://cdn.jsdelivr.net/npm/alpinejs@3.13.5/dist/cdn.min.js', category: 'JS Library', name: 'Alpine.js (jsdelivr)' },
+            { url: 'https://cdn.jsdelivr.net/npm/htmx.org@1.9.10/dist/htmx.min.js', category: 'JS Library', name: 'htmx (jsdelivr)' },
+            { url: 'https://cdn.jsdelivr.net/npm/sweetalert2@11.10.5/dist/sweetalert2.all.min.js', category: 'JS Library', name: 'SweetAlert2 (jsdelivr)' },
+            { url: 'https://cdn.jsdelivr.net/npm/luxon@3.4.4/build/global/luxon.min.js', category: 'JS Library', name: 'Luxon (jsdelivr)' },
+
+            // JS Libraries - unpkg CDN
+            { url: 'https://unpkg.com/react@18.2.0/umd/react.production.min.js', category: 'JS Library', name: 'React (unpkg)' },
+
+            // CSS Frameworks - cdnjs
+            { url: 'https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css', category: 'CSS', name: 'Bootstrap CSS' },
+            { url: 'https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css', category: 'CSS', name: 'Tailwind CSS' },
+            { url: 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css', category: 'CSS', name: 'Font Awesome CSS' },
+            { url: 'https://cdnjs.cloudflare.com/ajax/libs/bulma/1.0.0/css/bulma.min.css', category: 'CSS', name: 'Bulma CSS' },
+            { url: 'https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css', category: 'CSS', name: 'Materialize CSS' },
+            { url: 'https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css', category: 'CSS', name: 'Normalize.css' },
+            { url: 'https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css', category: 'CSS', name: 'Animate.css' },
+            { url: 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css', category: 'CSS', name: 'Highlight.js Theme' },
+            { url: 'https://cdnjs.cloudflare.com/ajax/libs/prism/9000.0.1/themes/prism.min.css', category: 'CSS', name: 'Prism.js Theme' },
+            { url: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css', category: 'CSS', name: 'Leaflet CSS' },
+
+            // Images - Wikimedia Commons (CORS-friendly)
+            { url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/Camponotus_flavomarginatus_ant.jpg/800px-Camponotus_flavomarginatus_ant.jpg', category: 'Image', name: 'Wikimedia JPEG 800px' },
+            { url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/47/PNG_transparency_demonstration_1.png/300px-PNG_transparency_demonstration_1.png', category: 'Image', name: 'Wikimedia PNG 300px' },
+            { url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Image_created_with_a_mobile_phone.png/1200px-Image_created_with_a_mobile_phone.png', category: 'Image', name: 'Wikimedia PNG 1200px' },
+            { url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Fronalpstock_big.jpg/1280px-Fronalpstock_big.jpg', category: 'Image', name: 'Wikimedia JPEG 1280px' },
+            { url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/ec/Mona_Lisa%2C_by_Leonardo_da_Vinci%2C_from_C2RMF_retouched.jpg/800px-Mona_Lisa%2C_by_Leonardo_da_Vinci%2C_from_C2RMF_retouched.jpg', category: 'Image', name: 'Wikimedia Mona Lisa' },
+            { url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/66/VanGogh-starry_night_ballance1.jpg/1280px-VanGogh-starry_night_ballance1.jpg', category: 'Image', name: 'Wikimedia Starry Night' },
+            { url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a5/Tsunami_by_hokusai_19th_century.jpg/1280px-Tsunami_by_hokusai_19th_century.jpg', category: 'Image', name: 'Wikimedia Great Wave' },
+            { url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4f/Felis_silvestris_catus_lying_on_rice_straw.jpg/1280px-Felis_silvestris_catus_lying_on_rice_straw.jpg', category: 'Image', name: 'Wikimedia Cat' },
+
+            // Images - Placeholder services
+            { url: 'https://picsum.photos/800/600', category: 'Image', name: 'Lorem Picsum 800x600' },
+            { url: 'https://picsum.photos/1200/800', category: 'Image', name: 'Lorem Picsum 1200x800' },
+
+            // Fonts - cdnjs
+            { url: 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/webfonts/fa-solid-900.woff2', category: 'Font', name: 'Font Awesome Solid WOFF2' },
+            { url: 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/webfonts/fa-regular-400.woff2', category: 'Font', name: 'Font Awesome Regular WOFF2' },
+            { url: 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/webfonts/fa-brands-400.woff2', category: 'Font', name: 'Font Awesome Brands WOFF2' },
+
+            // Fonts - Google Fonts
+            { url: 'https://fonts.gstatic.com/s/roboto/v30/KFOmCnqEu92Fr1Mu4mxP.ttf', category: 'Font', name: 'Google Roboto Regular' },
+            { url: 'https://fonts.gstatic.com/s/roboto/v30/KFOlCnqEu92Fr1MmWUlfBBc9.ttf', category: 'Font', name: 'Google Roboto Bold' },
+            { url: 'https://fonts.gstatic.com/s/lato/v24/S6uyw4BMUTPHjx4wWw.ttf', category: 'Font', name: 'Google Lato' },
+            { url: 'https://fonts.gstatic.com/s/montserrat/v26/JTUHjIg1_i6t8kCHKm4532VJOt5-QNFgpCtr6Ew-.ttf', category: 'Font', name: 'Google Montserrat' },
+            { url: 'https://fonts.gstatic.com/s/poppins/v20/pxiEyp8kv8JHgFVrFJA.ttf', category: 'Font', name: 'Google Poppins' },
+
+            // JSON APIs
+            { url: 'https://jsonplaceholder.typicode.com/posts', category: 'JSON API', name: 'JSONPlaceholder posts' },
+            { url: 'https://jsonplaceholder.typicode.com/comments', category: 'JSON API', name: 'JSONPlaceholder comments' },
+            { url: 'https://jsonplaceholder.typicode.com/users', category: 'JSON API', name: 'JSONPlaceholder users' },
+            { url: 'https://api.github.com/repos/mozilla/gecko-dev', category: 'JSON API', name: 'GitHub API gecko-dev' },
+            { url: 'https://httpbin.org/json', category: 'JSON API', name: 'httpbin JSON' },
+            { url: 'https://httpbin.org/headers', category: 'JSON API', name: 'httpbin headers' },
+            { url: 'https://dummyjson.com/products', category: 'JSON API', name: 'DummyJSON products' },
+            { url: 'https://fakestoreapi.com/products', category: 'JSON API', name: 'FakeStore products' },
+
+            // Data files
+            { url: 'https://raw.githubusercontent.com/datasets/covid-19/main/data/countries-aggregated.csv', category: 'Data', name: 'COVID-19 CSV (GitHub)' },
+            { url: 'https://raw.githubusercontent.com/datasets/world-cities/master/data/world-cities.csv', category: 'Data', name: 'World Cities CSV (GitHub)' },
+        ];
+
+        function showStatus(message) {
+            const el = document.getElementById('status');
+            el.style.display = 'block';
+            el.textContent = message;
+        }
+
+        function hideStatus() {
+            document.getElementById('status').style.display = 'none';
+        }
+
+        function clearResults() {
+            document.getElementById('results').innerHTML = '';
+            hideStatus();
+        }
+
+        function calculateStats(values) {
+            if (values.length === 0) return null;
+            const sorted = values.slice().sort((a, b) => a - b);
+            const sum = sorted.reduce((a, b) => a + b, 0);
+            const mean = sum / sorted.length;
+            const mid = Math.floor(sorted.length / 2);
+            const median = sorted.length % 2 === 0
+                ? (sorted[mid - 1] + sorted[mid]) / 2
+                : sorted[mid];
+            const min = sorted[0];
+            const max = sorted[sorted.length - 1];
+            const variance = sorted.reduce((acc, val) => acc + Math.pow(val - mean, 2), 0) / sorted.length;
+            const stdDev = Math.sqrt(variance);
+            const relStdDev = (stdDev / mean) * 100;
+            return { mean, median, min, max, relStdDev, count: sorted.length };
+        }
+
+        async function fetchWithTiming(asset, iteration) {
+            const startTime = performance.now();
+            try {
+                const cacheBustUrl = asset.url + (asset.url.includes('?') ? '&' : '?') + '_cb=' + Date.now() + Math.random();
+                const response = await fetch(cacheBustUrl, { cache: 'no-store' });
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                const reader = response.body.getReader();
+                let receivedLength = 0;
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+                    receivedLength += value.length;
+                }
+                const endTime = performance.now();
+                const duration = endTime - startTime;
+                const throughputMbps = (receivedLength * 8 / 1000000) / (duration / 1000);
+                return {
+                    url: asset.url,
+                    name: asset.name,
+                    category: asset.category,
+                    iteration,
+                    duration,
+                    bytes: receivedLength,
+                    throughputMbps,
+                    status: 'OK'
+                };
+            } catch (error) {
+                const endTime = performance.now();
+                return {
+                    url: asset.url,
+                    name: asset.name,
+                    category: asset.category,
+                    iteration,
+                    duration: endTime - startTime,
+                    bytes: 0,
+                    throughputMbps: 0,
+                    status: `Error: ${error.message}`
+                };
+            }
+        }
+
+        async function runSlidingWindowTest(assets, iterations, concurrency, onProgress) {
+            const results = [];
+            const tasks = [];
+            for (let i = 0; i < iterations; i++) {
+                for (const asset of assets) {
+                    tasks.push({ asset, iteration: i + 1 });
+                }
+            }
+
+            let nextIndex = 0;
+            let completed = 0;
+            const total = tasks.length;
+
+            async function startRequest() {
+                if (nextIndex >= tasks.length) return null;
+                const { asset, iteration } = tasks[nextIndex++];
+                const result = await fetchWithTiming(asset, iteration);
+                results.push(result);
+                completed++;
+                onProgress(completed, total);
+                return result;
+            }
+
+            const activePromises = new Set();
+            for (let i = 0; i < Math.min(concurrency, tasks.length); i++) {
+                const promise = startRequest().then(result => {
+                    activePromises.delete(promise);
+                    return result;
+                });
+                activePromises.add(promise);
+            }
+
+            while (activePromises.size > 0) {
+                await Promise.race(activePromises);
+                if (nextIndex < tasks.length) {
+                    const promise = startRequest().then(result => {
+                        activePromises.delete(promise);
+                        return result;
+                    });
+                    activePromises.add(promise);
+                }
+            }
+
+            return results;
+        }
+
+        function renderResults(results, container) {
+            const section = document.createElement('div');
+            section.className = 'results-section';
+
+            const successfulResults = results.filter(r => r.status === 'OK');
+            const durations = successfulResults.map(r => r.duration);
+            const throughputs = successfulResults.map(r => r.throughputMbps);
+            const latencyStats = calculateStats(durations);
+            const throughputStats = calculateStats(throughputs);
+
+            let html = '<h2>Overall Statistics</h2>';
+
+            if (latencyStats) {
+                html += `
+                    <div class="stats-row">
+                        <strong>Latency:</strong>
+                        <span class="metric">
+                            <div class="metric-label">Mean</div>
+                            <div class="metric-value">${latencyStats.mean.toFixed(2)} ms</div>
+                        </span>
+                        <span class="metric">
+                            <div class="metric-label">Median</div>
+                            <div class="metric-value">${latencyStats.median.toFixed(2)} ms</div>
+                        </span>
+                        <span class="metric">
+                            <div class="metric-label">Min</div>
+                            <div class="metric-value">${latencyStats.min.toFixed(2)} ms</div>
+                        </span>
+                        <span class="metric">
+                            <div class="metric-label">Max</div>
+                            <div class="metric-value">${latencyStats.max.toFixed(2)} ms</div>
+                        </span>
+                        <span class="metric">
+                            <div class="metric-label">Relative Std Dev</div>
+                            <div class="metric-value">${latencyStats.relStdDev.toFixed(1)}%</div>
+                        </span>
+                    </div>
+                    <div class="stats-row">
+                        <strong>Throughput:</strong>
+                        <span class="metric">
+                            <div class="metric-label">Mean</div>
+                            <div class="metric-value">${throughputStats.mean.toFixed(2)} Mbps</div>
+                        </span>
+                        <span class="metric">
+                            <div class="metric-label">Median</div>
+                            <div class="metric-value">${throughputStats.median.toFixed(2)} Mbps</div>
+                        </span>
+                        <span class="metric">
+                            <div class="metric-label">Min</div>
+                            <div class="metric-value">${throughputStats.min.toFixed(2)} Mbps</div>
+                        </span>
+                        <span class="metric">
+                            <div class="metric-label">Max</div>
+                            <div class="metric-value">${throughputStats.max.toFixed(2)} Mbps</div>
+                        </span>
+                        <span class="metric">
+                            <div class="metric-label">Relative Std Dev</div>
+                            <div class="metric-value">${throughputStats.relStdDev.toFixed(1)}%</div>
+                        </span>
+                    </div>
+                `;
+            }
+
+            // Group by asset for per-asset stats
+            const byAsset = {};
+            for (const r of results) {
+                if (!byAsset[r.url]) {
+                    byAsset[r.url] = { name: r.name, category: r.category, results: [] };
+                }
+                byAsset[r.url].results.push(r);
+            }
+
+            html += `
+                <h2>Per-Asset Results</h2>
+                <details open>
+                    <summary>${Object.keys(byAsset).length} assets, ${results.length} total requests</summary>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Category</th>
+                                <th>Name</th>
+                                <th>Size</th>
+                                <th>Mean Latency</th>
+                                <th>Mean Throughput</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+
+            for (const [url, data] of Object.entries(byAsset)) {
+                const successful = data.results.filter(r => r.status === 'OK');
+                const failed = data.results.length - successful.length;
+                const avgDuration = successful.length > 0
+                    ? successful.reduce((a, r) => a + r.duration, 0) / successful.length
+                    : 0;
+                const avgThroughput = successful.length > 0
+                    ? successful.reduce((a, r) => a + r.throughputMbps, 0) / successful.length
+                    : 0;
+                const avgBytes = successful.length > 0
+                    ? successful.reduce((a, r) => a + r.bytes, 0) / successful.length
+                    : 0;
+
+                const sizeStr = avgBytes > 1000000
+                    ? `${(avgBytes / 1000000).toFixed(2)} MB`
+                    : avgBytes > 1000
+                        ? `${(avgBytes / 1000).toFixed(1)} KB`
+                        : `${avgBytes.toFixed(0)} B`;
+
+                const statusStr = failed > 0 ? `${successful.length}/${data.results.length} OK` : 'OK';
+
+                html += `
+                    <tr>
+                        <td>${data.category}</td>
+                        <td>${data.name}</td>
+                        <td>${sizeStr}</td>
+                        <td>${avgDuration.toFixed(2)} ms</td>
+                        <td>${avgThroughput.toFixed(2)} Mbps</td>
+                        <td>${statusStr}</td>
+                    </tr>
+                `;
+            }
+
+            html += `
+                        </tbody>
+                    </table>
+                </details>
+            `;
+
+            // Raw results
+            html += `
+                <details>
+                    <summary>Raw results (${results.length} requests)</summary>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Iter</th>
+                                <th>Category</th>
+                                <th>Name</th>
+                                <th>Duration (ms)</th>
+                                <th>Throughput (Mbps)</th>
+                                <th>Bytes</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+
+            for (const r of results) {
+                html += `
+                    <tr>
+                        <td>${r.iteration}</td>
+                        <td>${r.category}</td>
+                        <td>${r.name}</td>
+                        <td>${r.duration.toFixed(2)}</td>
+                        <td>${r.throughputMbps.toFixed(2)}</td>
+                        <td>${r.bytes.toLocaleString()}</td>
+                        <td>${r.status}</td>
+                    </tr>
+                `;
+            }
+
+            html += `
+                        </tbody>
+                    </table>
+                </details>
+            `;
+
+            section.innerHTML = html;
+            container.appendChild(section);
+        }
+
+        async function runBenchmark() {
+            const concurrency = parseInt(document.getElementById('concurrency').value, 10);
+            const iterations = parseInt(document.getElementById('iterations').value, 10);
+            const resultsContainer = document.getElementById('results');
+
+            resultsContainer.innerHTML = '';
+
+            showStatus(`Running benchmark: 0/${ASSETS.length * iterations} requests...`);
+
+            const results = await runSlidingWindowTest(
+                ASSETS,
+                iterations,
+                concurrency,
+                (completed, total) => {
+                    showStatus(`Running benchmark: ${completed}/${total} requests...`);
+                }
+            );
+
+            renderResults(results, resultsContainer);
+
+            showStatus('Benchmark complete!');
+            setTimeout(hideStatus, 2000);
+        }
+    </script>
+</body>
+</html>
