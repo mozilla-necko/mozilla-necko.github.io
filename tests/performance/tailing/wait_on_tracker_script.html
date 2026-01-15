@@ -5,6 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Tracker Tailing Test Page</title>
 
+  <!-- Tracker script FIRST - starts before sync scripts, sees them as non-tailed -->
+  <script
+    async
+    src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-0000000000000000"
+    crossorigin="anonymous"
+    onload="window.trackerDone='onload'; if(window.showContent) showContent('adsbygoogle onload');"
+    onerror="window.trackerDone='onerror'; if(window.showContent) showContent('adsbygoogle onerror');">
+  </script>
+
   <!-- Small CSS files from multiple CDNs -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
@@ -33,15 +42,6 @@
   <!-- Sync JS from unpkg -->
   <script src="https://unpkg.com/dayjs@1.11.10/dayjs.min.js"></script>
   <script src="https://unpkg.com/lodash@4.17.21/lodash.min.js"></script>
-
-  <!-- Tracker script - async so it gets TailAllowed -->
-  <script
-    async
-    src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-0000000000000000"
-    crossorigin="anonymous"
-    onload="window.trackerDone='onload'; if(window.showContent) showContent('adsbygoogle onload');"
-    onerror="window.trackerDone='onerror'; if(window.showContent) showContent('adsbygoogle onerror');">
-  </script>
 
   <style>
     body {
