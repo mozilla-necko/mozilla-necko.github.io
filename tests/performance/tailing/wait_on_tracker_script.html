@@ -43,18 +43,6 @@
   <script defer src="https://unpkg.com/moment@2.30.1/moment.min.js"></script>
   <script defer src="https://unpkg.com/axios@1.6.8/dist/axios.min.js"></script>
 
-  <!-- Small delay to let URL classifier initialize -->
-  <script>var x=0; for(var j=0;j<5000000;j++)x+=j;</script>
-
-  <!-- TRACKER after defer scripts - starts while they're still loading in parallel -->
-  <script
-    async
-    src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-0000000000000000"
-    crossorigin="anonymous"
-    onload="window.trackerDone='onload'; if(window.showContent) showContent('adsbygoogle onload');"
-    onerror="window.trackerDone='onerror'; if(window.showContent) showContent('adsbygoogle onerror');">
-  </script>
-
   <style>
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -101,15 +89,24 @@
   </style>
 </head>
 <body>
-  <!-- Pi calculation to delay DCL (doesn't block network requests) -->
+  <!-- TRACKER in body - gets classified, starts while defer scripts still loading -->
+  <script
+    async
+    src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-0000000000000000"
+    crossorigin="anonymous"
+    onload="window.trackerDone='onload'; if(window.showContent) showContent('adsbygoogle onload');"
+    onerror="window.trackerDone='onerror'; if(window.showContent) showContent('adsbygoogle onerror');">
+  </script>
+
+  <!-- Pi calculation to delay DCL - keeps quantum at 600ms -->
   <script>
     var pi = 0;
-    for (var round = 0; round < 20; round++) {
+    for (var round = 0; round < 8; round++) {
       for (var i = 0; i < 50000000; i++) {
         pi += (i % 2 === 0 ? 1 : -1) / (2 * i + 1);
       }
     }
-    console.log('Pi calc done: ' + (pi * 4 / 20));
+    console.log('Pi calc done: ' + (pi * 4 / 8));
   </script>
 
   <div id="loading-overlay">
