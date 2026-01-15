@@ -5,6 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Tracker Tailing Test Page</title>
 
+  <!-- Web Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Roboto:wght@300;400;500;700&family=Open+Sans:wght@300;400;600;700&family=Lato:wght@300;400;700&family=Montserrat:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
   <!-- CSS from multiple CDNs -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -59,6 +64,33 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intro.js/7.2.0/introjs.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/9000.0.1/themes/prism.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/1.0.0/css/bulma.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css">
+
+  <!-- Even more JS libraries -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/3.4.21/vue.global.prod.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.8.3/angular.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/ember.js/5.4.0/ember.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/backbone.js/1.6.0/backbone-min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/redux/5.0.1/redux.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mobx/6.12.0/mobx.umd.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/9000.0.1/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/scrollReveal.js/4.0.9/scrollreveal.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/typed.js/2.0.16/typed.umd.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/parallax.js/1.5.0/parallax.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/lazysizes/5.3.2/lazysizes.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.12.2/lottie.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.4/howler.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/wavesurfer.js/7.7.3/wavesurfer.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/plyr/3.7.8/plyr.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/video.js/8.10.0/video.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.2/Sortable.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/interact.js/1.10.26/interact.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/split.js/1.6.5/split.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.7.1/nouislider.min.js"></script>
 
   <style>
     body {
@@ -217,6 +249,28 @@
         <div class="col-md-3"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/47/PNG_transparency_demonstration_1.png/300px-PNG_transparency_demonstration_1.png" class="img-fluid rounded" alt="Dice"></div>
         <div class="col-md-3"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Image_created_with_a_mobile_phone.png/300px-Image_created_with_a_mobile_phone.png" class="img-fluid rounded" alt="Flower"></div>
         <div class="col-md-3"><img src="https://picsum.photos/seed/j10/300/200" class="img-fluid rounded" alt="Random"></div>
+      </div>
+
+      <!-- More large images -->
+      <div class="row mb-5">
+        <div class="col-md-4"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/1e/Sunrise_over_the_sea.jpg/1280px-Sunrise_over_the_sea.jpg" class="img-fluid rounded" alt="Sunrise"></div>
+        <div class="col-md-4"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c8/Altja_j%C3%B5gi_Lahemaal.jpg/1280px-Altja_j%C3%B5gi_Lahemaal.jpg" class="img-fluid rounded" alt="River"></div>
+        <div class="col-md-4"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/24701-nature-702755.jpg/1280px-24701-nature-702755.jpg" class="img-fluid rounded" alt="Nature"></div>
+      </div>
+      <div class="row mb-5">
+        <div class="col-md-3"><img src="https://picsum.photos/seed/k11/400/300" class="img-fluid rounded" alt="Random"></div>
+        <div class="col-md-3"><img src="https://picsum.photos/seed/l12/400/300" class="img-fluid rounded" alt="Random"></div>
+        <div class="col-md-3"><img src="https://picsum.photos/seed/m13/400/300" class="img-fluid rounded" alt="Random"></div>
+        <div class="col-md-3"><img src="https://picsum.photos/seed/n14/400/300" class="img-fluid rounded" alt="Random"></div>
+      </div>
+      <div class="row mb-5">
+        <div class="col-md-6"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/Perspectiva-conica-702.jpg/1200px-Perspectiva-conica-702.jpg" class="img-fluid rounded" alt="Architecture"></div>
+        <div class="col-md-6"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/94/Winter_landscape_in_Mauricie%2C_Qu%C3%A9bec.jpg/1280px-Winter_landscape_in_Mauricie%2C_Qu%C3%A9bec.jpg" class="img-fluid rounded" alt="Winter"></div>
+      </div>
+      <div class="row mb-5">
+        <div class="col-md-4"><img src="https://picsum.photos/seed/o15/500/400" class="img-fluid rounded" alt="Random"></div>
+        <div class="col-md-4"><img src="https://picsum.photos/seed/p16/500/400" class="img-fluid rounded" alt="Random"></div>
+        <div class="col-md-4"><img src="https://picsum.photos/seed/q17/500/400" class="img-fluid rounded" alt="Random"></div>
       </div>
     </section>
 
