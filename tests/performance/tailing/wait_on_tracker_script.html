@@ -5,49 +5,65 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Tracker Tailing Test Page</title>
 
-  <!-- CSS files - Leader, load in parallel, count as non-tailed -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css">
+  <!-- CSS from multiple CDNs - these are leaders -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/skeleton/2.0.4/skeleton.min.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/milligram/1.4.1/milligram.min.css">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
-  <link rel="stylesheet" href="https://unpkg.com/tailwindcss@2.2.19/dist/tailwind.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/normalize.css@8.0.1/normalize.css">
 
-  <!-- DEFER scripts - load in PARALLEL, count as non-tailed (Unblocked flag only) -->
-  <!-- cdnjs - large libraries -->
-  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
-  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.30.1/moment.min.js"></script>
-  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.21/lodash.min.js"></script>
-  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.8/axios.min.js"></script>
-  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.2/anime.min.js"></script>
-  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <!-- Synchronous JS from cdnjs.cloudflare.com - parser-blocking, non-tail requests -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.21/lodash.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.30.1/moment.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.8/axios.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 
-  <!-- jsdelivr - same large libraries, different domain -->
-  <script defer src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
-  <script defer src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
-  <script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-  <script defer src="https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js"></script>
-  <script defer src="https://cdn.jsdelivr.net/npm/moment@2.30.1/moment.min.js"></script>
-  <script defer src="https://cdn.jsdelivr.net/npm/axios@1.6.8/dist/axios.min.js"></script>
-  <script defer src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
-  <script defer src="https://cdn.jsdelivr.net/npm/animejs@3.2.2/lib/anime.min.js"></script>
+  <!-- Synchronous JS from cdn.jsdelivr.net -->
+  <script src="https://cdn.jsdelivr.net/npm/htmx.org@1.9.10/dist/htmx.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.5/dist/sweetalert2.all.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/luxon@3.4.4/build/global/luxon.min.js"></script>
 
-  <!-- unpkg - third domain -->
-  <script defer src="https://unpkg.com/three@0.128.0/build/three.min.js"></script>
-  <script defer src="https://unpkg.com/d3@7.9.0/dist/d3.min.js"></script>
-  <script defer src="https://unpkg.com/lodash@4.17.21/lodash.min.js"></script>
-  <script defer src="https://unpkg.com/moment@2.30.1/moment.min.js"></script>
-  <script defer src="https://unpkg.com/axios@1.6.8/dist/axios.min.js"></script>
+  <!-- Synchronous JS from unpkg.com -->
+  <script src="https://unpkg.com/react@18.2.0/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18.2.0/umd/react-dom.production.min.js"></script>
+
+  <!-- More from cdnjs -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.1/marked.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.10/dayjs.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.8/purify.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/quill/1.3.7/quill.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.11.8/umd/popper.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.1.4/toastr.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/intro.js/7.2.0/intro.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/dragula/3.7.3/dragula.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/6.1.10/index.global.min.js"></script>
+
+  <!-- Large bundles -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.0.379/pdf.min.mjs" type="module"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.1/fabric.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/paper.js/0.12.17/paper-full.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
+
+  <!-- More CSS -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/quill/1.3.7/quill.snow.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.1.4/toastr.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intro.js/7.2.0/introjs.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
 
   <style>
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-family: 'Inter', sans-serif;
       background: #f5f5f5;
-      margin: 0;
     }
     #loading-overlay {
       position: fixed;
@@ -62,7 +78,9 @@
       z-index: 9999;
       flex-direction: column;
     }
-    #loading-overlay.hidden { display: none; }
+    #loading-overlay.hidden {
+      display: none;
+    }
     .spinner {
       width: 48px;
       height: 48px;
@@ -71,128 +89,177 @@
       border-radius: 50%;
       animation: spin 1s linear infinite;
     }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    #content { opacity: 0; transition: opacity 0.3s; }
-    #content.loaded { opacity: 1; }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    #content {
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    #content.loaded {
+      opacity: 1;
+    }
     .hero {
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       color: white;
       padding: 80px 0;
       text-align: center;
     }
-    .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
-    .card-img { height: 200px; object-fit: cover; width: 100%; }
-    .row { display: flex; flex-wrap: wrap; margin: 0 -15px; }
-    .col { flex: 1; padding: 15px; min-width: 300px; }
-    .card { background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-    .card-body { padding: 20px; }
+    .card-img {
+      height: 200px;
+      object-fit: cover;
+    }
+    .feature-icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      color: #667eea;
+    }
   </style>
 </head>
 <body>
-  <!-- TRACKER in body - gets classified, starts while defer scripts still loading -->
+  <div id="loading-overlay">
+    <div class="spinner"></div>
+    <p style="margin-top: 20px; color: #666;">Loading personalization...</p>
+  </div>
+
+  <div id="content">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+      <div class="container">
+        <a class="navbar-brand" href="#">TailTest</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item"><a class="nav-link" href="#">Home</a></li>
+            <li class="nav-item"><a class="nav-link" href="#">Features</a></li>
+            <li class="nav-item"><a class="nav-link" href="#">Pricing</a></li>
+            <li class="nav-item"><a class="nav-link" href="#">Contact</a></li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <section class="hero">
+      <div class="container">
+        <h1 class="display-4 fw-bold">Tracker Tailing Test</h1>
+        <p class="lead">This page simulates a real website that blocks rendering until an ad script loads</p>
+        <p class="small">Test with different values of <code>network.http.tailing.delay-quantum</code> (default: 600ms)</p>
+      </div>
+    </section>
+
+    <section class="container my-5">
+      <h2 class="mb-4">Featured Content</h2>
+      <div class="row g-4">
+        <div class="col-md-4">
+          <div class="card h-100">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Fronalpstock_big.jpg/400px-Fronalpstock_big.jpg" class="card-img-top card-img" alt="Mountain">
+            <div class="card-body">
+              <h5 class="card-title">Mountain Adventure</h5>
+              <p class="card-text">Explore breathtaking mountain landscapes and discover hidden trails.</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card h-100">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a5/Tsunami_by_hokusai_19th_century.jpg/400px-Tsunami_by_hokusai_19th_century.jpg" class="card-img-top card-img" alt="Wave">
+            <div class="card-body">
+              <h5 class="card-title">Ocean Views</h5>
+              <p class="card-text">Relax by the sea and enjoy stunning coastal scenery.</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card h-100">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/66/VanGogh-starry_night_ballance1.jpg/400px-VanGogh-starry_night_ballance1.jpg" class="card-img-top card-img" alt="Starry Night">
+            <div class="card-body">
+              <h5 class="card-title">City Lights</h5>
+              <p class="card-text">Experience the vibrant energy of urban nightlife.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <h2 class="my-5">Features</h2>
+      <div class="row g-4 text-center">
+        <div class="col-md-3">
+          <div class="feature-icon"><i class="fas fa-rocket"></i></div>
+          <h5>Fast Performance</h5>
+          <p class="text-muted">Optimized for speed and efficiency</p>
+        </div>
+        <div class="col-md-3">
+          <div class="feature-icon"><i class="fas fa-shield-alt"></i></div>
+          <h5>Secure</h5>
+          <p class="text-muted">Enterprise-grade security</p>
+        </div>
+        <div class="col-md-3">
+          <div class="feature-icon"><i class="fas fa-mobile-alt"></i></div>
+          <h5>Responsive</h5>
+          <p class="text-muted">Works on all devices</p>
+        </div>
+        <div class="col-md-3">
+          <div class="feature-icon"><i class="fas fa-headset"></i></div>
+          <h5>Support</h5>
+          <p class="text-muted">24/7 customer support</p>
+        </div>
+      </div>
+
+      <div class="row my-5">
+        <div class="col-md-6">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/ec/Mona_Lisa%2C_by_Leonardo_da_Vinci%2C_from_C2RMF_retouched.jpg/600px-Mona_Lisa%2C_by_Leonardo_da_Vinci%2C_from_C2RMF_retouched.jpg" class="img-fluid rounded" alt="Mona Lisa">
+        </div>
+        <div class="col-md-6">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/4f/Felis_silvestris_catus_lying_on_rice_straw.jpg/600px-Felis_silvestris_catus_lying_on_rice_straw.jpg" class="img-fluid rounded" alt="Cat">
+        </div>
+      </div>
+
+      <div class="row mb-5">
+        <div class="col-md-3"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/Camponotus_flavomarginatus_ant.jpg/300px-Camponotus_flavomarginatus_ant.jpg" class="img-fluid rounded" alt="Ant"></div>
+        <div class="col-md-3"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/47/PNG_transparency_demonstration_1.png/300px-PNG_transparency_demonstration_1.png" class="img-fluid rounded" alt="Dice"></div>
+        <div class="col-md-3"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Image_created_with_a_mobile_phone.png/300px-Image_created_with_a_mobile_phone.png" class="img-fluid rounded" alt="Flower"></div>
+        <div class="col-md-3"><img src="https://picsum.photos/seed/j10/300/200" class="img-fluid rounded" alt="Random"></div>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- More synchronous scripts in body from multiple domains -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.2/anime.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.4/socket.io.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.13.6/underscore-min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/handlebars@4.7.8/dist/handlebars.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/rxjs@7.8.1/dist/bundles/rxjs.umd.min.js"></script>
+
+  <script>
+    const pageStart = performance.now();
+
+    function showContent(source) {
+      const loadTime = performance.now();
+      const delay = ((loadTime - pageStart) / 1000).toFixed(2);
+
+      document.getElementById('content').classList.add('loaded');
+      document.getElementById('loading-overlay').classList.add('hidden');
+
+      console.log(`Content shown after ${delay}s via ${source}`);
+    }
+
+    // Fallback timeout - like real sites do
+    const fallbackTimeout = setTimeout(() => {
+      console.warn('Fallback timeout triggered - ad script took too long');
+      showContent('fallback timeout (10s)');
+    }, 10000);
+  </script>
+
+  <!-- Google AdSense - a known tracker that will be tailed -->
+  <!-- async attribute is needed to get TailAllowed flag, otherwise Unblocked prevents tailing -->
   <script
     async
     src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-0000000000000000"
     crossorigin="anonymous"
-    onload="window.trackerDone='onload'; if(window.showContent) showContent('adsbygoogle onload');"
-    onerror="window.trackerDone='onerror'; if(window.showContent) showContent('adsbygoogle onerror');">
-  </script>
-
-  <!-- Pi calculation to delay DCL - keeps quantum at 600ms -->
-  <script>
-    var pi = 0;
-    for (var round = 0; round < 8; round++) {
-      for (var i = 0; i < 50000000; i++) {
-        pi += (i % 2 === 0 ? 1 : -1) / (2 * i + 1);
-      }
-    }
-    console.log('Pi calc done: ' + (pi * 4 / 8));
-  </script>
-
-  <div id="loading-overlay">
-    <div class="spinner"></div>
-    <p style="margin-top: 20px; color: #666;">Loading...</p>
-  </div>
-
-  <div id="content">
-    <section class="hero">
-      <div class="container">
-        <h1>Tracker Tailing Test</h1>
-        <p>This page waits for a tracker script before showing content</p>
-      </div>
-    </section>
-
-    <section class="container" style="padding: 40px 20px;">
-      <h2>Featured Content</h2>
-      <div class="row">
-        <div class="col">
-          <div class="card">
-            <img src="https://picsum.photos/seed/t1/800/400" class="card-img" alt="Image 1">
-            <div class="card-body">
-              <h3>Mountain Adventure</h3>
-              <p>Explore breathtaking mountain landscapes.</p>
-            </div>
-          </div>
-        </div>
-        <div class="col">
-          <div class="card">
-            <img src="https://picsum.photos/seed/t2/800/400" class="card-img" alt="Image 2">
-            <div class="card-body">
-              <h3>Ocean Views</h3>
-              <p>Relax by the sea and enjoy coastal scenery.</p>
-            </div>
-          </div>
-        </div>
-        <div class="col">
-          <div class="card">
-            <img src="https://picsum.photos/seed/t3/800/400" class="card-img" alt="Image 3">
-            <div class="card-body">
-              <h3>City Lights</h3>
-              <p>Experience the vibrant energy of nightlife.</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <h2 style="margin-top: 40px;">Gallery</h2>
-      <div class="row">
-        <div class="col"><img src="https://picsum.photos/seed/g1/600/400" class="card-img" alt="Gallery 1"></div>
-        <div class="col"><img src="https://picsum.photos/seed/g2/600/400" class="card-img" alt="Gallery 2"></div>
-        <div class="col"><img src="https://picsum.photos/seed/g3/600/400" class="card-img" alt="Gallery 3"></div>
-      </div>
-      <div class="row">
-        <div class="col"><img src="https://picsum.photos/seed/g4/600/400" class="card-img" alt="Gallery 4"></div>
-        <div class="col"><img src="https://picsum.photos/seed/g5/600/400" class="card-img" alt="Gallery 5"></div>
-        <div class="col"><img src="https://picsum.photos/seed/g6/600/400" class="card-img" alt="Gallery 6"></div>
-      </div>
-    </section>
-  </div>
-
-  <script>
-    var pageStart = performance.now();
-    window.contentShown = false;
-
-    window.showContent = function(source) {
-      if (window.contentShown) return;
-      window.contentShown = true;
-
-      var loadTime = performance.now();
-      var delay = ((loadTime - pageStart) / 1000).toFixed(2);
-      document.getElementById('content').classList.add('loaded');
-      document.getElementById('loading-overlay').classList.add('hidden');
-      console.log('Content shown after ' + delay + 's via ' + source);
-
-      if (window.fallbackTimeout) clearTimeout(window.fallbackTimeout);
-    };
-
-    if (window.trackerDone) {
-      showContent('adsbygoogle ' + window.trackerDone + ' (early)');
-    }
-
-    window.fallbackTimeout = setTimeout(function() {
-      console.warn('Fallback timeout triggered - ad script took too long');
-      showContent('fallback timeout (15s)');
-    }, 15000);
+    onload="clearTimeout(fallbackTimeout); showContent('adsbygoogle onload');"
+    onerror="clearTimeout(fallbackTimeout); showContent('adsbygoogle onerror');">
   </script>
 </body>
 </html>
