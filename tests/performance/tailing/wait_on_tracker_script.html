@@ -1,4 +1,31 @@
 <!DOCTYPE html>
+<!--
+  Tracker Tailing Test Page
+
+  This page tests the impact of network.http.tailing.delay-quantum on page load times
+  when a tracker script blocks page rendering.
+
+  IMPORTANT: Must be hosted on a real HTTPS server (not localhost) for tracker
+  classification to work with Firefox's default tracking lists.
+
+  HOW TO TEST:
+    1. Host this file on a real HTTPS server
+    2. Run Firefox with logging:
+       MOZ_LOG="nsHttp:5,RequestContext:5" MOZ_LOG_FILE=/tmp/tailing.log ./mach run "https://yourserver.com/test_tailing_blocker.html"
+    3. Check logs for "tail-queue=1" entries to see tailing in action
+    4. Compare delay values with different quantum settings:
+       - network.http.tailing.delay-quantum = 600 (default)
+       - network.http.tailing.delay-quantum = 100 (faster unblock)
+
+  EXPECTED BEHAVIOR:
+    - With 600ms quantum: delays stay near 6000ms cap, tracker blocked longer
+    - With 100ms quantum: delays decrease faster (100ms per non-tail completion)
+
+  The page shows a loading spinner until kameleoon.js loads or errors.
+  With tailing, this delay is extended while other scripts load first.
+
+  See bug 1962817 for context.
+-->
 <html>
 <head>
   <meta charset="utf-8">
@@ -252,14 +279,13 @@
     }, 10000);
   </script>
 
-  <!-- Google AdSense - a known tracker that will be tailed -->
-  <!-- async attribute is needed to get TailAllowed flag, otherwise Unblocked prevents tailing -->
+  <!-- Kameleoon tracker - known to be tailed on real sites (see bug 1962817) -->
+  <!-- async attribute is needed to get TailAllowed flag -->
   <script
     async
-    src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-0000000000000000"
-    crossorigin="anonymous"
-    onload="clearTimeout(fallbackTimeout); showContent('adsbygoogle onload');"
-    onerror="clearTimeout(fallbackTimeout); showContent('adsbygoogle onerror');">
+    src="https://y53sxvyp2y.kameleoon.eu/kameleoon.js"
+    onload="clearTimeout(fallbackTimeout); showContent('kameleoon onload');"
+    onerror="clearTimeout(fallbackTimeout); showContent('kameleoon onerror');">
   </script>
 </body>
 </html>
